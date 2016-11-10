@@ -160,7 +160,7 @@ public class CrawlTweetList{
     		cbu.setUserName(userName);
     		System.out.println(userName);
         }
-        
+        //print start time
 		SimpleDateFormat time=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String TimeString = time.format(new java.util.Date());
 		System.out.println("start at"+TimeString);
