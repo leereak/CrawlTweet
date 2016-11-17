@@ -147,14 +147,15 @@ public class CrawlAllTweets
 				
 				//tweet context
 				Element textContainer=content.getElementsByClass("js-tweet-text-container").first();
-				tweet.put("tweet_context", textContainer.text());
+				String tweetcontext=textContainer.text().replaceAll("[^\\u0000-\\uFFFF]", "");
+				tweet.put("tweet_context", tweetcontext);
 				//tweet mentioned person
 			 	//Elements mentions = textContainer.getElementsByClass("data-mentioned-user-id");		
 				Elements mentions = textContainer.select("a[data-mentioned-user-id]");
 				if(mentions!=null){
 					String [] mentionUsers=new String [mentions.size()];
 					for (int i = 0; i < mentionUsers.length; i++) {
-						mentionUsers[i]=mentions.attr("data-mentioned-user-id");					
+						mentionUsers[i]=mentions.get(i).attr("data-mentioned-user-id");					
 					}
 					tweet.put("mention_user", mentionUsers);				
 				}
@@ -164,6 +165,9 @@ public class CrawlAllTweets
 				tweet.put("tweet_reply", comments.get(0).attr("data-tweet-stat-count"));
 				tweet.put("tweet_retweet",comments.get(1).attr("data-tweet-stat-count"));
 				tweet.put("tweet_like", comments.get(2).attr("data-tweet-stat-count"));
+				//hashtags
+				Elements hashtags=content.select("a.twitter-hashtag.pretty-link");
+				tweet.put("hashtag", processHashtags(hashtags));
 				//transform to json
 				JSONObject jtweet=JSONObject.fromObject(tweet);
 //				System.out.println(jtweet.toString());
@@ -228,7 +232,15 @@ public class CrawlAllTweets
         request.releaseConnection();
 		return result;
 	}
-
+	private static String processHashtags(Elements hashtags) {
+		StringBuilder sb = new StringBuilder();
+		for(Element hashtag:hashtags){
+			sb.append(hashtag.text());
+			sb.append(" ");
+		}
+		
+		return sb.toString().trim();
+	}
 	public static void main(String[] args) {
 		CrawlAllTweets cot = new CrawlAllTweets();
     	//String tweetid ="/ErinSchrode/status/794255752055562240";
